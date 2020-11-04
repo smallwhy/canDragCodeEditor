@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" style="overflow: hidden;">
+<head>
+  <meta charset="utf-8">
+  <title>可拖拽的代码编辑器</title>
+  <style>
+    html {overflow-x: hidden;}
+    .editor-title{ width: 760px; padding: 8px 20px; background: #efefef; margin: 0; }
+  </style>
+</head>
+<body>
+    <button id="toBackBtn">复位</button>
+    <!-- 代码编辑器 -->
+    <div id="editorContainer">
+        <!-- 标题 -->
+        <h3 id="editorTitle" class="editor-title">作答区域</h3>
+        <!-- 编辑器 -->
+        <div id="editor" style="width: 800px; height: 600px; border: 1px solid grey"></div>
+    </div>
+    
+
+  <script src="./jquery.min.js"></script>
+  <script src="./jquery-ui.min.js"></script> <!-- 支持拖拽 -->
+    <script src="./ace/ace.js" type="text/javascript" charset="utf-8"></script> <!-- 编辑器 -->
+    <script src="./ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        instructEditor('javascript'); // 构造Editor实例
+        initDrag(); // 初始化拖拽
+
+        function instructEditor(language="java") { // 通过配置language来这是编辑器的语言类型
+            var editor = ace.edit("editor"); // 初始化编辑器
+            editor.setTheme("ace/theme/cobalt"); // 设置主题（动态加载ace/theme-主题类型文件.js文件）
+            editor.session.setMode(`ace/mode/${language}`); // 设置语言类型（动态加载ace/mode-语言类型文件.js文件）
+            editor.setFontSize(16); // 设置字体
+            editor.setReadOnly(false); // 是否只读
+            editor.setOption('wrap', 'free'); // 自动换行（off为关闭）
+            editor.session.setTabSize(2); // 设置tab键的空格大小
+            editor.setShowPrintMargin(false); // 设置打印边距可见度
+            editor.setHighlightActiveLine(true); // 设置代码高亮
+
+            // 启用提示菜单
+            var languageTools = ace.require("ace/ext/language_tools");
+            var languageTools = ace.require("ace/ext/static_highlight");
+            editor.setOptions({
+                enableBasicAutocompletion: true,
+                enableSnippets: true,
+                enableSnippets: true,
+                enableLiveAutocompletion: true,
+            });
+
+            // editor编辑器取值、赋值操作
+            editor.setValue('<h1>赋值测试。。。</h1>');
+            editor.getValue();
+        }
+
+        function initDrag() {
+            // 可拖动，可拖动至页面任何地方，不出现滚动条
+            $( "#editorContainer").draggable({ 
+                snap: "html", 
+                handle: '#editorTitle', // 控制 只能点击标题拖拽 ； 如无此项，#editorContainer整块都可拖动；
+                start: function(event) {} // 开始拖拽事件，可用于某种情况下判断是否可拖拽
+            });
+
+            // 复位
+            resetPosition();
+        }
+
+        function resetPosition() {
+            // 记录初始位置
+            $("#editorContainer").data("left",$("#editorContainer").css('left')).data("top",$("#editorContainer").css('top'));
+            // 复原操作
+            $('#toBackBtn').click(function() {
+                $("#editorContainer").animate({
+                    "left": $("#editorContainer").data("left"),
+                    "top": $("#editorContainer").data("top")
+                }); 
+            });  
+        }
+
+    </script>
+</body>
+</html>
